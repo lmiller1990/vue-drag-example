@@ -1,11 +1,31 @@
 <template>
   <div class="outer">
-    <div class="board outer" @dragover="dragover" @dragend="dragend" :id="id" v-for="id in boardIds">
+    <div 
+      class="board outer" 
+      v-for="id in boardIds"
+      :id="id" 
+      @dragover="dragover" 
+      @dragend="dragend" 
+    >
       <div class="title">
-        Board Id {{ boards[id].id }} name: {{ boards[id].name }}
+        Board Id {{ id }} name: {{ boards[id].name }}
       </div>
-      <div draggable  :id="piece.id" v-for="piece in boards[id].pieces" @dragstart="dragstart" :class="'piece board-' +  id.toString()">
-        {{ piece.id }}
+
+      <div 
+        v-for="piece in boards[id].pieces" 
+        :id="piece.id" 
+        :class="'piece piece-' + id + ' board-' +  id.toString()"
+        @dragstart="dragstart" 
+        @dragover="dragoverPiece"
+        draggable 
+      >
+        <div class="piece-id">
+          {{ piece.id }} 
+        </div>
+
+        <div class="piece-order">
+          Order: {{ piece.orderInBoard }}
+        </div>
       </div>
     </div>
   </div>
@@ -16,6 +36,9 @@ export default {
   name: 'app',
 
   methods: {
+    dragoverPiece (e) {
+    },
+
     inBoard (boardId, pieceId) {
       return this.boards[boardId].pieces.filter(x => x.id == pieceId).length > 0
     },
@@ -23,6 +46,10 @@ export default {
     removePiece (boardId, pieceId) {
       let index = this.boards[boardId].pieces.findIndex(x => x.id == pieceId)
       this.boards[boardId].pieces.splice(index, 1)
+    },
+
+    addPiece (boardId, pieceId) {
+      this.boards[this.currentBoard].pieces.push({ id: pieceId, boardId })
     },
 
     dragover (e) {
@@ -34,7 +61,7 @@ export default {
     dragend (e) {
         if (this.inBoard(this.currentBoard, this.currentPiece.id) === false) {
           // add new element
-          this.boards[this.currentBoard].pieces.push({ id: this.currentPiece.id, boardId: parseInt(e.srcElement.id) })
+          this.addPiece(parseInt(e.srcElement.id), this.currentPiece.id)
           // remove old element
           this.removePiece(this.originalBoard, this.currentPiece.id)
         }
@@ -42,7 +69,7 @@ export default {
     },
 
     dragstart (e) {
-      this.originalBoard = e.srcElement.className[e.srcElement.className.length-1]
+      this.originalBoard = e.srcElement.className.split('-')[2]
       this.currentPiece = this.boards[this.originalBoard].pieces.filter(x => x.id == e.srcElement.id)[0]
     }
   },
@@ -54,27 +81,27 @@ export default {
       currentPiece: null,
       boardIds: [0, 1, 2],
       boards: {
-        '2': {
-          name: 'Other board',
-          pieces: []
-        },
         '0': {
-          name: 'Top board',
+          name: '上ボード',
           pieces: [
-            { id: 10, boardId: 0 },
-            { id: 49545, boardId: 0 },
-            { id: 445, boardId: 0 },
+            { id: 10, boardId: 0, orderInBoard: 0 },
+            { id: 49545, boardId: 0, orderInBoard: 1 },
+            { id: 445, boardId: 0, orderInBoard: 2 },
           ]
         },
         '1': {
-          name: 'Bottom board',
+          name: '中ボード',
           pieces: [
-            { id: 20, boardId: 1 },
-            { id: 566, boardId: 1 },
-            { id: 23, boardId: 1 },
-            { id: 40, boardId: 1 }
+            { id: 20, boardId: 1, orderInBoard: 0 },
+            { id: 566, boardId: 1, orderInBoard: 1 },
+            { id: 23, boardId: 1, orderInBoard: 2 },
+            { id: 40, boardId: 1, orderInBoard: 3 }
           ] 
-        }
+        },
+        '2': {
+          name: '下ボード',
+          pieces: []
+        },
       }
     }
   }
@@ -97,5 +124,7 @@ export default {
   border: 1px solid pink;
   padding: 2px;
   margin: 2px;
+  display: flex;
+  justify-content: space-between;
 }
 </style>
