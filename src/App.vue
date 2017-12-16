@@ -44,20 +44,28 @@ export default {
         let targetBoardId = e.srcElement.className.split(' ')[2].split('-')[1]
         // same board - switch positions
         if (sourceBoardId == targetBoardId) {
-          let targetPiece = this.getPiece(sourceBoardId, targetId)
-          let temp = targetPiece.orderInBoard
-          targetPiece.orderInBoard = this.currentPiece.orderInBoard
-          this.currentPiece.orderInBoard = temp
+          let targetIndex = this.getIndexInBoard(sourceBoardId, targetId)
+          let sourceIndex = this.getIndexInBoard(sourceBoardId, this.currentPiece.id)
+
+          this.swapPiecesInBoard(sourceBoardId, targetIndex, sourceIndex)
         }
       }
     },
 
-    inBoard (boardId, pieceId) {
-      return this.boards[boardId].pieces.filter(x => x.id == pieceId).length > 0
+    swapPiecesInBoard (boardId, targetIndex, sourceIndex) {
+      let temp = JSON.parse(JSON.stringify(this.boards[boardId].pieces[targetIndex]))
+
+      this.boards[boardId].pieces.splice(targetIndex, 1, this.boards[boardId].pieces[sourceIndex])
+      this.boards[boardId].pieces.splice(sourceIndex, 1, temp)
+
     },
 
-    getPiece (boardId, pieceId) {
-      return this.boards[boardId].pieces.filter(x => x.id == pieceId)[0]
+    getIndexInBoard (boardId, pieceId) {
+      return this.boards[boardId].pieces.findIndex(x => x.id == pieceId)
+    },
+
+    inBoard (boardId, pieceId) {
+      return this.boards[boardId].pieces.filter(x => x.id == pieceId).length > 0
     },
 
     removePiece (boardId, pieceId) {
