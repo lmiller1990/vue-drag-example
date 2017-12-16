@@ -1,6 +1,5 @@
 <template>
   <div class="outer">
-    {{ currentPiece }}
     <div 
       class="board outer" 
       v-for="id in boardIds"
@@ -21,11 +20,11 @@
         draggable 
       >
         <div class="piece-id">
-          {{ piece.id }} 
+          id: {{ piece.id }} 
         </div>
 
         <div class="piece-order">
-          Order: {{ piece.orderInBoard }}
+          BoardId: {{ piece.boardId }} | Order: {{ piece.orderInBoard }}
         </div>
       </div>
     </div>
@@ -73,8 +72,8 @@ export default {
       this.boards[boardId].pieces.splice(index, 1)
     },
 
-    addPiece (boardId, pieceId) {
-      this.boards[this.currentBoard].pieces.push({ id: pieceId, boardId, orderInBoard: '?' })
+    addPieceToBoard (boardId, pieceId) {
+      this.boards[boardId].pieces.push({ id: pieceId, boardId, orderInBoard: '?' })
     },
 
     dragover (e) {
@@ -86,7 +85,7 @@ export default {
     dragend (e) {
       if (this.inBoard(this.currentBoard, this.currentPiece.id) === false) {
         // add new element
-        this.addPiece(parseInt(e.srcElement.id), this.currentPiece.id)
+        this.addPieceToBoard(this.currentBoard, this.currentPiece.id)
         // remove old element
         this.removePiece(this.originalBoard, this.currentPiece.id)
       }
