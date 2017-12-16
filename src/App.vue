@@ -74,7 +74,7 @@ export default {
     },
 
     addPiece (boardId, pieceId) {
-      this.boards[this.currentBoard].pieces.push({ id: pieceId, boardId })
+      this.boards[this.currentBoard].pieces.push({ id: pieceId, boardId, orderInBoard: '?' })
     },
 
     dragover (e) {
@@ -84,16 +84,18 @@ export default {
     },
 
     dragend (e) {
-        if (this.inBoard(this.currentBoard, this.currentPiece.id) === false) {
-          // add new element
-          this.addPiece(parseInt(e.srcElement.id), this.currentPiece.id)
-          // remove old element
-          this.removePiece(this.originalBoard, this.currentPiece.id)
-        }
+      if (this.inBoard(this.currentBoard, this.currentPiece.id) === false) {
+        // add new element
+        this.addPiece(parseInt(e.srcElement.id), this.currentPiece.id)
+        // remove old element
+        this.removePiece(this.originalBoard, this.currentPiece.id)
+      }
+
       this.pieceId = -1
     },
 
     dragstart (e) {
+      // get the board from the class name
       this.originalBoard = e.srcElement.className.split('-')[2]
       this.currentPiece = this.boards[this.originalBoard].pieces.filter(x => x.id == e.srcElement.id)[0]
     }
