@@ -1,5 +1,6 @@
 <template>
   <div class="outer">
+    {{ currentPiece }}
     <div 
       class="board outer" 
       v-for="id in boardIds"
@@ -37,10 +38,26 @@ export default {
 
   methods: {
     dragoverPiece (e) {
+      let targetId = e.target.id
+      if (targetId && targetId != this.currentPiece.id) {
+        let sourceBoardId = this.currentPiece.boardId
+        let targetBoardId = e.srcElement.className.split(' ')[2].split('-')[1]
+        // same board - switch positions
+        if (sourceBoardId == targetBoardId) {
+          let targetPiece = this.getPiece(sourceBoardId, targetId)
+          let temp = targetPiece.orderInBoard
+          targetPiece.orderInBoard = this.currentPiece.orderInBoard
+          this.currentPiece.orderInBoard = temp
+        }
+      }
     },
 
     inBoard (boardId, pieceId) {
       return this.boards[boardId].pieces.filter(x => x.id == pieceId).length > 0
+    },
+
+    getPiece (boardId, pieceId) {
+      return this.boards[boardId].pieces.filter(x => x.id == pieceId)[0]
     },
 
     removePiece (boardId, pieceId) {
